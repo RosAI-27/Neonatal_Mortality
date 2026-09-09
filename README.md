@@ -1,211 +1,205 @@
-# 🏥 Déterminants de la Mortalité Néonatale au Cameroun
+# Neonatal Mortality in Cameroon — EDS 2018
 
-Application Streamlit d'analyse des données EDS Cameroun 2018 avec comparaison SMOTE vs Sans SMOTE.
+A data science project investigating factors associated with neonatal mortality in Cameroon using the 2018 Demographic and Health Survey (DHS/EDS) data. The project combines statistical analysis with machine learning and evaluates the effect of SMOTE on an imbalanced binary classification problem.
 
----
+> **Research focus:** determinants of neonatal mortality in Cameroon using a machine-learning approach based on DHS 2018 data.
 
-## 📋 Prérequis
+## Project overview
 
-- Python 3.9+
-- pip ou conda
+Neonatal mortality refers to the death of a live-born child during the first 28 days of life. Because neonatal deaths represent a small proportion of births in the analytical dataset, the target variable is highly imbalanced. This project therefore compares conventional machine-learning models with models trained using synthetic minority oversampling (SMOTE).
 
-## 🚀 Installation locale
+The workflow covers:
 
-### 1. Cloner le dépôt
+- data preparation and exploratory analysis;
+- descriptive and bivariate analysis;
+- stratified train/test splitting;
+- machine-learning classification;
+- comparison of models with and without SMOTE;
+- evaluation using metrics suited to imbalanced classification;
+- model interpretation;
+- an interactive Streamlit application for exploring the results and making predictions with the saved model.
 
-```bash
-git clone https://github.com/votre-username/neonatal-mortality-cameroon.git
-cd neonatal-mortality-cameroon
+## Dataset
+
+The analytical dataset is derived from the **Cameroon Demographic and Health Survey (EDS/DHS) 2018**, based on the Birth Recode data.
+
+| Item | Description |
+|---|---|
+| Source | EDS/DHS Cameroon 2018 |
+| Analytical observations | 33,988 births |
+| Analytical variables | 15 |
+| Target | `neonatal_mort` |
+| Target distribution | 32,891 survivors / 1,097 neonatal deaths |
+| Mortality proportion | 3.23% |
+| Period represented | 2013–2018 |
+
+The prepared CSV is included in the repository for reproducibility. The Streamlit application also allows the user to upload a compatible CSV through the sidebar.
+
+> **Data note:** The repository contains a prepared analytical dataset rather than the original DHS `.SAV` file. The original survey remains subject to the DHS Program's data-access and usage conditions.
+
+## Methodology
+
+### 1. Data preparation
+
+The analysis uses demographic, socioeconomic, maternal, child, and healthcare-related variables, including maternal age, parity, child's sex, maternal education, wealth, residence, region, perceived birth size, birth interval, and antenatal-care visits.
+
+### 2. Train/test split
+
+A stratified 80/20 split is used so that the minority-class proportion remains comparable between training and test sets.
+
+### 3. Preprocessing
+
+Numerical variables are imputed and standardized, while categorical variables are imputed and one-hot encoded. Preprocessing is performed within machine-learning pipelines to reduce the risk of data leakage.
+
+### 4. Models
+
+The project compares five classifiers:
+
+- Logistic Regression
+- Random Forest
+- Gradient Boosting
+- XGBoost
+- LightGBM
+
+Each model is evaluated under two conditions:
+
+1. without SMOTE (baseline);
+2. with SMOTE applied to the training data only.
+
+### 5. Evaluation
+
+Performance is assessed using metrics that are informative for an imbalanced target, including:
+
+- ROC-AUC;
+- F1-score;
+- recall (sensitivity);
+- precision;
+- balanced accuracy;
+- average precision;
+- confusion matrices and classification reports.
+
+### 6. Data leakage control
+
+SMOTE is applied **after the train/test split and only to the training data**. The test set remains untouched so that evaluation reflects performance on the original class distribution.
+
+## Repository structure
+
+```text
+Neonatal_Mortality/
+├── README.md
+├── requirements.txt
+├── neonatal_mortality.ipynb
+├── streamlit_app.py
+├── neonatal_mortality_data.csv
+├── best_xgboost_smote_model.pkl
+├── preprocessor.pkl
+│
+├── data/
+│   └── README.md
+├── models/
+│   └── README.md
+├── outputs/
+│   └── README.md
+└── docs/
+    └── PROJECT_STRUCTURE.md
 ```
 
-### 2. Créer un environnement virtuel (recommandé)
+The `data/`, `models/`, and `outputs/` directories provide a clean structure for future iterations. The current dataset and model artifacts intentionally remain at the repository root because the existing notebook and Streamlit application use root-relative paths. This refactor therefore improves organization **without rewriting the analytical code or breaking the application**.
+
+## Streamlit application
+
+The repository includes an interactive Streamlit dashboard presenting eight sections:
+
+1. **Overview** — key indicators and study context;
+2. **Descriptive analysis** — distributions and mortality rates by selected variables;
+3. **Bivariate tests** — statistical associations with neonatal mortality;
+4. **Machine Learning — Without SMOTE**;
+5. **Machine Learning — With SMOTE**;
+6. **SMOTE comparison**;
+7. **Results & conclusions**;
+8. **Prediction tool** using the saved XGBoost model and preprocessing object.
+
+The application can operate with demonstration data when no CSV is uploaded, while the prepared dataset can be supplied through the file uploader for analysis.
+
+## Installation and usage
+
+### Requirements
+
+- Python 3.9 or later
+- pip or conda
+
+### 1. Clone the repository
 
 ```bash
-# Avec venv
-python -m venv venv
-
-# Activation Linux/Mac
-source venv/bin/activate
-
-# Activation Windows
-venv\Scripts\activate
+git clone https://github.com/RosAI-27/Neonatal_Mortality.git
+cd Neonatal_Mortality
 ```
 
-### 3. Installer les dépendances
+### 2. Create and activate a virtual environment
+
+**Windows:**
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+**Linux/macOS:**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**requirements.txt :**
-```
-streamlit>=1.28.0
-pandas>=2.0.0
-numpy>=1.24.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
-scikit-learn>=1.3.0
-xgboost>=2.0.0
-lightgbm>=4.1.0
-imbalanced-learn>=0.11.0
-joblib>=1.3.0
-pyreadstat>=1.2.0
-```
-
-### 4. Préparer les données
-
-Placez le fichier de données dans le dossier `data/` :
-- `neonatal_mortality_data.csv` (séparateur `;`)
-
-Ou utilisez les données de démonstration intégrées.
-
-### 5. Lancer l'application
+### 4. Run the Streamlit application
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-L'application sera accessible à l'adresse : `http://localhost:8501`
+The application will normally be available at `http://localhost:8501`.
 
----
+## Model artifacts
 
-## 🌐 Déploiement en ligne
+The prediction module relies on two serialized artifacts:
 
-### Option A : Streamlit Community Cloud (Gratuit)
+- `best_xgboost_smote_model.pkl` — trained XGBoost classifier;
+- `preprocessor.pkl` — fitted preprocessing transformer.
 
-1. Poussez votre code sur GitHub (inclure `streamlit_app.py`, `requirements.txt`, et les modèles `.pkl` si disponibles)
-2. Connectez-vous sur [share.streamlit.io](https://share.streamlit.io)
-3. Cliquez sur **"New app"** → Sélectionnez votre dépôt
-4. Spécifiez le fichier principal : `streamlit_app.py`
-5. Cliquez **Deploy**
+These files are kept at the root of the repository in the current version so that the existing application can load them without code changes.
 
-**Structure du dépôt GitHub recommandée :**
-```
-neonatal-mortality-cameroon/
-├── streamlit_app.py          # Application principale
-├── requirements.txt          # Dépendances
-├── best_xgboost_smote_model.pkl   # Modèle (optionnel)
-├── preprocessor.pkl               # Préprocesseur (optionnel)
-├── data/
-│   └── neonatal_mortality_data.csv
-└── README.md
-```
+## Results at a glance
 
-### Option B : Heroku
+The analysis shows that class imbalance is a major consideration: neonatal deaths account for only **3.23%** of observations. In the recorded model comparison, SMOTE substantially changes sensitivity for some models but does not automatically improve every performance metric. This is why model selection should not rely on accuracy alone.
 
-```bash
-# Installer Heroku CLI
-heroku login
-heroku create neonatal-mortality-cm
+The notebook records the detailed experimental results, including the comparison of AUC, F1, recall, balanced accuracy, precision, and average precision across models.
 
-# Créer Procfile
-echo "web: streamlit run streamlit_app.py --server.port=$PORT" > Procfile
+## Academic context
 
-# Créer runtime.txt
-echo "python-3.11.6" > runtime.txt
+**Project title:** *The Determinants of Neonatal Mortality in Cameroon: A Machine Learning Approach Using DHS 2018*
 
-git add .
-git commit -m "Deploy to Heroku"
-git push heroku main
-```
+This work was developed as part of a Master's-level Data Science project at Saint Jean Institut University.
 
-### Option C : Docker
+**Author:** BAPFUBUSA SIAPZE Rose Ange  
+**Program:** Master 1 Data Science  
+**Institution:** Saint Jean Institut University  
+**Supervisor:** Pr. NGUEFACK  
+**Academic year:** 2025–2026
 
-```dockerfile
-# Dockerfile
-FROM python:3.11-slim
+The project was also presented at the **5th Cameroonian Statistical Days**, where it received **3rd place** recognition.
 
-WORKDIR /app
+## References
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+- Cameroon Demographic and Health Survey (EDS/DHS), 2018.
+- Mosley, W. H., & Chen, L. C. (1984). An analytical framework for the study of child survival in developing countries.
+- Chawla, N. V., Bowyer, K. W., Hall, L. O., & Kegelmeyer, W. P. (2002). SMOTE: Synthetic Minority Over-sampling Technique.
 
-COPY . .
+## Disclaimer
 
-EXPOSE 8501
-
-CMD ["streamlit", "run", "streamlit_app.py", "--server.address=0.0.0.0"]
-```
-
-```bash
-# Build et run
-docker build -t neonatal-app .
-docker run -p 8501:8501 neonatal-app
-```
-
----
-
-## 📁 Fichiers optionnels pour l'outil de prédiction
-
-Pour activer l'outil de prédiction avancé (Module 8), placez ces fichiers dans le même dossier que `streamlit_app.py` :
-
-- `best_xgboost_smote_model.pkl` — Modèle XGBoost entraîné avec SMOTE
-- `preprocessor.pkl` — Pipeline de prétraitement (StandardScaler + OneHotEncoder)
-
-**Génération des modèles (extrait du code Python) :**
-```python
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline as ImbPipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from xgboost import XGBClassifier
-import joblib
-
-# Prétraitement
-preprocessor = ColumnTransformer([
-    ('num', StandardScaler(), ['maternal_age', 'maternal_age_sq', 'parity', 'region']),
-    ('cat', OneHotEncoder(handle_unknown='ignore'), 
-     ['sex_child', 'education', 'wealth', 'residence', 'baby_size', 'birth_interval', 'anc_visits'])
-])
-
-# Pipeline SMOTE + XGBoost
-pipeline = ImbPipeline([
-    ('prep', preprocessor),
-    ('smote', SMOTE(k_neighbors=5, random_state=42)),
-    ('model', XGBClassifier(n_estimators=200, scale_pos_weight=1, max_depth=5, learning_rate=0.1))
-])
-
-# Entraînement
-pipeline.fit(X_train, y_train)
-
-# Sauvegarde
-joblib.dump(pipeline.named_steps['model'], 'best_xgboost_smote_model.pkl')
-joblib.dump(pipeline.named_steps['prep'], 'preprocessor.pkl')
-```
-
----
-
-## 🔧 Structure de l'application
-
-| Module | Description |
-|--------|-------------|
-| 📊 Vue d'ensemble | KPIs, contexte, distribution des classes |
-| 🔬 Analyse descriptive | Statistiques pondérées par sous-groupes |
-| 📈 Tests bivariés | Chi-deux, t-tests, force d'association |
-| 🤖 ML — Sans SMOTE | Baseline (5 algorithmes) |
-| ⚖️ ML — Avec SMOTE | Sur-échantillonnage synthétique |
-| 🔄 Comparaison SMOTE | Analyse détaillée des différences |
-| 📋 Résultats & Conclusions | Odds Ratios, recommandations |
-| 🩺 Outil de prédiction | Score de risque néonatal personnalisé |
-
----
-
-## ⚠️ Notes importantes
-
-- **Data Leakage** : SMOTE est appliqué UNIQUEMENT après le split Train/Test, jamais avant.
-- **Déséquilibre** : La classe minoritaire représente 3.2% — justifiant l'approche SMOTE.
-- **Données** : L'application fonctionne avec des données de démonstration si aucun CSV n'est uploadé.
-
----
-
-## 📚 Références
-
-- EDS Cameroun 2018 (DHS Program) — CMBR71FL.SAV
-- Mosley & Chen (1984) — Cadre conceptuel de la survie infantile
-- Chawla et al. (2002) — SMOTE
-
----
-
-**Auteur** : BAPFUBUSA SIAPZE Rose Ange — Master 1 Data Science, Saint Jean Institut University  
-**Encadrant** : Pr. NGUEFACK  
-**Année académique** : 2025-2026
+This project is intended for academic and research purposes. A machine-learning prediction should not be interpreted as a clinical diagnosis or as a substitute for professional medical judgment.
