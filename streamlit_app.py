@@ -176,8 +176,8 @@ def generate_demo_data():
 @st.cache_resource
 def load_model_and_preprocessor():
     """Charge le modèle XGBoost et le préprocesseur sauvegardés."""
-    model_path = Path(__file__).parent / "best_xgboost_smote_model.pkl"
-    prep_path = Path(__file__).parent / "preprocessor.pkl"
+    model_path = Path(__file__).parent / "models" / "best_xgboost_smote_model.pkl"
+    prep_path = Path(__file__).parent / "models" / "preprocessor.pkl"
 
     if model_path.exists() and prep_path.exists():
         model = joblib.load(model_path)
@@ -731,7 +731,7 @@ elif page == "🩺 Outil de prédiction":
     st.markdown('<div class="section-header">🩺 Outil de prédiction du risque néonatal</div>', unsafe_allow_html=True)
 
     if not model_loaded:
-        st.markdown('<div class="warning-box">⚠️ <b>Modèle non chargé.</b> L\'outil fonctionne en mode simplifié (formule logistique). Placez <code>best_xgboost_smote_model.pkl</code> et <code>preprocessor.pkl</code> dans le même dossier que cette application.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="warning-box">⚠️ <b>Modèle non chargé.</b> L\'outil fonctionne en mode simplifié (formule logistique). Les fichiers <code>best_xgboost_smote_model.pkl</code> et <code>preprocessor.pkl</code> sont stockés dans le dossier <code>models/</code>.</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="info-box">ℹ️ Cet outil calcule un <b>score de risque</b> basé sur les déterminants identifiés. À des fins éducatives uniquement.</div>', unsafe_allow_html=True)
 
