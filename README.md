@@ -33,7 +33,7 @@ The analytical dataset is derived from the **Cameroon Demographic and Health Sur
 | Mortality proportion | 3.23% |
 | Period represented | 2013–2018 |
 
-The prepared CSV is included in the repository for reproducibility. The Streamlit application also allows the user to upload a compatible CSV through the sidebar.
+The prepared CSV is included in `data/` for reproducibility. The Streamlit application also allows the user to upload a compatible CSV through the sidebar.
 
 > **Data note:** The repository contains a prepared analytical dataset rather than the original DHS `.SAV` file. The original survey remains subject to the DHS Program's data-access and usage conditions.
 
@@ -88,23 +88,21 @@ SMOTE is applied **after the train/test split and only to the training data**. T
 Neonatal_Mortality/
 ├── README.md
 ├── requirements.txt
-├── neonatal_mortality.ipynb
 ├── streamlit_app.py
-├── neonatal_mortality_data.csv
-├── best_xgboost_smote_model.pkl
-├── preprocessor.pkl
-│
 ├── data/
-│   └── README.md
+│   └── neonatal_mortality_data.csv
 ├── models/
-│   └── README.md
-├── outputs/
-│   └── README.md
-└── docs/
-    └── PROJECT_STRUCTURE.md
+│   ├── best_xgboost_smote_model.pkl
+│   └── preprocessor.pkl
+├── notebooks/
+│   └── neonatal_mortality.ipynb
+├── docs/
+│   └── PROJECT_STRUCTURE.md
+└── outputs/
+    └── README.md
 ```
 
-The `data/`, `models/`, and `outputs/` directories provide a clean structure for future iterations. The current dataset and model artifacts intentionally remain at the repository root because the existing notebook and Streamlit application use root-relative paths. This refactor therefore improves organization **without rewriting the analytical code or breaking the application**.
+The structure separates application code, data, trained artifacts, analysis notebooks, documentation, and generated outputs while keeping the Streamlit entry point at the repository root.
 
 ## Streamlit application
 
@@ -121,27 +119,40 @@ The repository includes an interactive Streamlit dashboard presenting eight sect
 
 The application can operate with demonstration data when no CSV is uploaded, while the prepared dataset can be supplied through the file uploader for analysis.
 
-## Installation and usage
+### Run locally
+
+From the repository root:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The application will normally be available at `http://localhost:8501`.
+
+### Deploy
+
+The Streamlit entry point is intentionally kept at the repository root. On a Streamlit deployment service, select:
+
+- **Repository:** `RosAI-27/Neonatal_Mortality`
+- **Branch:** `refactor/professional-structure`
+- **Main file:** `streamlit_app.py`
+
+The application loads its model artifacts from `models/`.
+
+## Installation
 
 ### Requirements
 
 - Python 3.9 or later
 - pip or conda
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/RosAI-27/Neonatal_Mortality.git
-cd Neonatal_Mortality
-```
-
-### 2. Create and activate a virtual environment
+### Create and activate a virtual environment
 
 **Windows:**
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
+.venv\\Scripts\\activate
 ```
 
 **Linux/macOS:**
@@ -151,32 +162,24 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install dependencies
+### Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Streamlit application
-
-```bash
-streamlit run streamlit_app.py
-```
-
-The application will normally be available at `http://localhost:8501`.
-
 ## Model artifacts
 
-The prediction module relies on two serialized artifacts:
+The prediction module relies on:
 
-- `best_xgboost_smote_model.pkl` — trained XGBoost classifier;
-- `preprocessor.pkl` — fitted preprocessing transformer.
+- `models/best_xgboost_smote_model.pkl` — saved XGBoost classifier;
+- `models/preprocessor.pkl` — saved preprocessing transformer.
 
-These files are kept at the root of the repository in the current version so that the existing application can load them without code changes.
+The notebook writes experimental model files and generated results to the corresponding project directories when those cells are executed.
 
 ## Results at a glance
 
-The analysis shows that class imbalance is a major consideration: neonatal deaths account for only **3.23%** of observations. In the recorded model comparison, SMOTE substantially changes sensitivity for some models but does not automatically improve every performance metric. This is why model selection should not rely on accuracy alone.
+The analysis shows that class imbalance is a major consideration: neonatal deaths account for only **3.23%** of observations. In the recorded model comparison, SMOTE substantially changes sensitivity for some models but does not automatically improve every performance metric. This is why model evaluation should not rely on accuracy alone.
 
 The notebook records the detailed experimental results, including the comparison of AUC, F1, recall, balanced accuracy, precision, and average precision across models.
 
