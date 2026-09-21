@@ -1,49 +1,46 @@
 # Project Structure
 
-This repository contains the analysis workflow and the Streamlit application for the neonatal mortality study.
+The repository separates the application, data, model artifacts, analysis notebook, documentation, and generated outputs.
 
 ```text
 Neonatal_Mortality/
 ├── README.md
 ├── requirements.txt
-├── neonatal_mortality.ipynb        # Main analysis notebook
-├── streamlit_app.py                # Streamlit application
-├── neonatal_mortality_data.csv     # Prepared dataset used by the analysis
-├── best_xgboost_smote_model.pkl    # Saved XGBoost model used by the app
-├── preprocessor.pkl                # Saved preprocessing object used by the app
-│
+├── streamlit_app.py                # Streamlit entry point
 ├── data/
-│   └── README.md                   # Data documentation and handling notes
-│
+│   └── neonatal_mortality_data.csv # Prepared analytical dataset
 ├── models/
-│   └── README.md                   # Model artifact documentation
-│
-├── outputs/
-│   └── README.md                   # Intended location for generated figures/results
-│
-└── docs/
-    └── PROJECT_STRUCTURE.md        # Repository organization guide
+│   ├── best_xgboost_smote_model.pkl
+│   └── preprocessor.pkl
+├── notebooks/
+│   └── neonatal_mortality.ipynb    # Main analysis notebook
+├── docs/
+│   └── PROJECT_STRUCTURE.md
+└── outputs/
+    └── README.md
 ```
 
-## Why the main artifacts remain at the repository root
+## Why this structure?
 
-The notebook and Streamlit application currently use root-relative paths for the prepared dataset and saved model artifacts. Keeping those files in place on this refactor branch avoids changing the analytical code or introducing broken paths.
+- **Root:** application entry point and dependency definition.
+- **data/:** datasets used by the project.
+- **models/:** serialized models and preprocessing artifacts.
+- **notebooks/:** exploratory and experimental analysis.
+- **outputs/:** generated figures, tables, and result files.
+- **docs/:** project documentation.
 
-The `data/`, `models/`, and `outputs/` directories are therefore documentation-ready locations for future iterations. Once the application and notebook paths are deliberately migrated together, the binary/data artifacts can be moved without breaking reproducibility.
+## Deployment
 
-## Protected core files
-
-The following files contain the project's main analytical/application logic and should not be casually rewritten during structural refactors:
-
-- `neonatal_mortality.ipynb`
-- `streamlit_app.py`
-- `requirements.txt`
-- `neonatal_mortality_data.csv`
-- `best_xgboost_smote_model.pkl`
-- `preprocessor.pkl`
-
-Structural changes should preserve the current application entry point:
+The Streamlit entry point remains at the repository root:
 
 ```bash
 streamlit run streamlit_app.py
 ```
+
+The application loads model artifacts from `models/`.
+
+## Refactor principle
+
+The dataset and model artifacts were moved without modifying their contents. The notebook and Streamlit application received only the path changes required by the new directory structure.
+
+The `main` branch is not modified by this refactor.
